@@ -71,6 +71,8 @@ export class UserService {
 
     await this.sendCodeByEmail(user.email, verificationCode);
 
+    await this.userRepository.save(user);
+
     return {
       message:
         'OTP sent successfully, check your email. if not found check on spam',
