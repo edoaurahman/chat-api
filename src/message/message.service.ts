@@ -4,8 +4,10 @@ import { Message } from './entities/message.entity';
 
 @Injectable()
 export class MessageService {
-  messages: Message[] = [{ name: 'Edo', text: 'Hello' }];
-  clientToUser = {};
+  private privateRooms: { [roomId: string]: string[] } = {};
+  private messages: Message[] = [{ name: 'Edo', text: 'Hello' }];
+  private clientToUser = {};
+
   identify(name: string, clientId: string) {
     this.clientToUser[clientId] = name;
 
@@ -26,5 +28,31 @@ export class MessageService {
 
   findAll() {
     return this.messages;
+  }
+
+  createPrivateRoom(roomId: string) {
+    this.privateRooms[roomId] = [];
+  }
+
+  joinPrivateRoom(roomId: string, clientId: string) {
+    if (!this.privateRooms[roomId]) {
+      this.privateRooms[roomId] = [];
+    }
+    this.privateRooms[roomId].push(clientId);
+  }
+
+  leavePrivateRoom(roomId: string, clientId: string) {
+    if (this.privateRooms[roomId]) {
+      this.privateRooms[roomId] = this.privateRooms[roomId].filter(
+        (id) => id !== clientId,
+      );
+      if (this.privateRooms[roomId].length === 0) {
+        delete this.privateRooms[roomId];
+      }
+    }
+  }
+
+  getClientsInPrivateRoom(roomId: string) {
+    return this.privateRooms[roomId] || [];
   }
 }
