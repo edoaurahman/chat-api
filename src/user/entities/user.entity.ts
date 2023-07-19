@@ -11,7 +11,12 @@ export class User {
   @Column('varchar', { name: 'email', length: 50, unique: true })
   email: string;
 
-  @Column('varchar', { length: 6, name: 'verification_code', unique: true })
+  @Column('varchar', {
+    length: 6,
+    name: 'verification_code',
+    unique: true,
+    nullable: true,
+  })
   verificationCode: string;
 
   @Column('datetime', { name: 'verified_at', nullable: true })
