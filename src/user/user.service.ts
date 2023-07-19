@@ -119,7 +119,6 @@ export class UserService {
         subject: 'OTP Verification',
         html: `<p>Your otp code is : <h1>${code}</h1></p>`,
       });
-      console.log('Email sent');
     } catch (e) {
       console.log(e);
       throw new HttpException('OTP not sent', 500);
