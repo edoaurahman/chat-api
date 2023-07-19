@@ -62,6 +62,13 @@ export class UserService {
 
   async create(createUserDto: CreateUserDto) {
     const { name, email } = createUserDto;
+
+    // check if user has been registered
+    const check = await this.userRepository.findOneBy({ email });
+    if (check) {
+      throw new HttpException('User already exists', 400);
+    }
+
     const verificationCode = Math.random()
       .toString(36)
       .substring(2, 8)
