@@ -50,7 +50,7 @@ export class UserService {
     if (user.verificationCode !== code) {
       throw new HttpException('Wrong verification code', 401);
     }
-    user.verificationCode = '';
+    user.verificationCode = null;
     user.verifiedAt = new Date();
     await this.userRepository.save(user);
 
