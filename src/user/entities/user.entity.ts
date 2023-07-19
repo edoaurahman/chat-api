@@ -14,7 +14,6 @@ export class User {
   @Column('varchar', {
     length: 6,
     name: 'verification_code',
-    unique: true,
     nullable: true,
   })
   verificationCode: string;
