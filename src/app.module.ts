@@ -13,8 +13,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
     UserModule,
     TypeOrmModule.forRoot(ormconfig),
     MailerModule.forRoot({
-      transport:
-        'smtps://edoaurahman@gmail.com:chaaucgoofalzihv@smtp.gmail.com',
+      transport: `smtps://${process.env.SMTP_USERNAME}:${process.env.SMTP_PASSWORD}@${process.env.SMTP_HOST}`,
     }),
   ],
   controllers: [AppController],
