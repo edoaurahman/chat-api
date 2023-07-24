@@ -19,57 +19,26 @@ export class MessageGateway {
   server: Server;
   constructor(private readonly messageService: MessageService) {}
 
-  @SubscribeMessage('createMessage')
-  async create(
-    @MessageBody() createMessageDto: CreateMessageDto,
-    @ConnectedSocket() client: Socket,
-  ) {
-    const message = this.messageService.create(createMessageDto, client.id);
-    this.server.emit('message', message);
-    return message;
-  }
-
-  @SubscribeMessage('findAllMessages')
-  findAll() {
-    return this.messageService.findAll();
-  }
-
   @SubscribeMessage('join')
   joinRoom(
-    @MessageBody('name') name: string,
-    @MessageBody('roomId') roomId: string,
+    @MessageBody('username') username: string,
     @ConnectedSocket() client: Socket,
   ) {
-    this.messageService.identify(name, client.id);
-    this.messageService.joinPrivateRoom(roomId, client.id);
-    return this.messageService.getClientName(client.id);
-  }
-
-  @SubscribeMessage('typing')
-  async typing(
-    @MessageBody('isTyping') isTyping: boolean,
-    @MessageBody('roomId') roomId: string,
-    @ConnectedSocket() client: Socket,
-  ) {
-    const name = await this.messageService.getClientName(client.id);
-    const roomClients = this.messageService.getClientsInPrivateRoom(roomId);
-
-    roomClients.forEach((clientId) => {
-      this.server.to(clientId).emit('typing', { name, isTyping });
-    });
+    this.messageService.addUser(username, client.id);
   }
 
   @SubscribeMessage('privateMessage')
-  privateMessage(
-    @MessageBody('roomId') roomId: string,
-    @MessageBody('message') message: string,
-    @ConnectedSocket() client: Socket,
-  ) {
-    const name = this.messageService.getClientName(client.id);
-    const roomClients = this.messageService.getClientsInPrivateRoom(roomId);
+  privateMessage(@MessageBody() createMessage: CreateMessageDto) {
+    const { sender, receiver, message, time } = createMessage;
+    console.log(createMessage);
 
-    roomClients.forEach((clientId) => {
-      this.server.to(clientId).emit('privateMessage', { name, message });
-    });
+    this.server
+      .to(this.messageService.getClientId(receiver))
+      .emit('newPrivateMessage', {
+        sender,
+        receiver,
+        message,
+        time,
+      });
   }
 }

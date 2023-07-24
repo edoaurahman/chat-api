@@ -34,6 +34,7 @@ export class UserService {
     return {
       message:
         'OTP sent successfully, check your email. if not found check on spam',
+      username: user.username,
     };
   }
 
@@ -61,7 +62,7 @@ export class UserService {
   }
 
   async create(createUserDto: CreateUserDto) {
-    const { name, email } = createUserDto;
+    const { name, email, username } = createUserDto;
 
     // check if user has been registered
     const check = await this.userRepository.findOneBy({ email });
@@ -74,7 +75,7 @@ export class UserService {
       .substring(2, 8)
       .toUpperCase();
 
-    const user = { name, email, verificationCode };
+    const user = { name, username, email, verificationCode };
 
     await this.sendCodeByEmail(user.email, verificationCode);
 
@@ -130,5 +131,16 @@ export class UserService {
       console.log(e);
       throw new HttpException('OTP not sent', 500);
     }
+  }
+
+  async findByUsername(username: string) {
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .where('user.username LIKE :username', { username: `%${username}%` })
+      .getMany();
+    if (!user) {
+      throw new HttpException('User not found', 404);
+    }
+    return user;
   }
 }
