@@ -48,10 +48,10 @@ export class MessageGateway {
     }
   }
 
-  @SubscribeMessage('disconnect')
+  @SubscribeMessage('disconnecting')
   disconnect(@ConnectedSocket() client: Socket) {
     const username = this.messageService.getUsernameByClientId(client.id);
-    console.log(username);
+    console.log(username, client.id);
 
     if (username) {
       this.messageService.removeUser(username);
