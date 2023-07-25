@@ -20,11 +20,12 @@ export class MessageGateway {
   constructor(private readonly messageService: MessageService) {}
 
   @SubscribeMessage('join')
-  joinRoom(
+  join(
     @MessageBody('username') username: string,
     @ConnectedSocket() client: Socket,
   ) {
     this.messageService.addUser(username, client.id);
+    this.sendPendingMessages(username);
   }
 
   @SubscribeMessage('privateMessage')
@@ -32,13 +33,48 @@ export class MessageGateway {
     const { sender, receiver, message, time } = createMessage;
     console.log(createMessage);
 
-    this.server
-      .to(this.messageService.getClientId(receiver))
-      .emit('newPrivateMessage', {
+    const receiverClientId =
+      this.messageService.getClientIdByUsername(receiver);
+    if (receiverClientId) {
+      this.server.to(receiverClientId).emit('newPrivateMessage', {
         sender,
         receiver,
         message,
         time,
       });
+    } else {
+      // Jika penerima tidak ada (tidak terhubung), simpan pesan dalam daftar tertunda
+      this.messageService.addPendingMessage(receiver, createMessage);
+    }
+  }
+
+  @SubscribeMessage('disconnect')
+  disconnect(@ConnectedSocket() client: Socket) {
+    const username = this.messageService.getUsernameByClientId(client.id);
+    if (username) {
+      this.messageService.removeUser(username);
+    }
+  }
+
+  sendPendingMessages(username: string) {
+    const clientId =
+      this.messageService.getClientIdByUsernameOnPendingMessage(username);
+    if (clientId) {
+      const pendingMessages = this.messageService.getPendingMessages(username);
+      if (pendingMessages.length > 0) {
+        pendingMessages.forEach((messages) => {
+          const { sender, receiver, message, time } = messages;
+          this.server.to(clientId).emit('newPrivateMessage', {
+            sender,
+            receiver,
+            message,
+            time,
+          });
+        });
+
+        // Setelah pesan tertunda terkirim, hapus dari daftar pesan tertunda
+        this.messageService.deletePendingMessages(username);
+      }
+    }
   }
 }
