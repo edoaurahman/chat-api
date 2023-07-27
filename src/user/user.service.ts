@@ -24,7 +24,7 @@ export class UserService {
     const verificationCode = Math.random()
       .toString(36)
       .substring(2, 8)
-      .toUpperCase();
+      .toLowerCase();
 
     user.verifiedAt = null;
     user.verificationCode = verificationCode;
@@ -39,7 +39,7 @@ export class UserService {
   }
 
   async verificationCode(verificationCode: VerificationCode) {
-    const { email, verificationCode: code } = verificationCode;
+    const { email, verificationCode: code, fcmToken } = verificationCode;
     const user = await this.userRepository.findOneBy({ email });
 
     if (!user) {
@@ -53,6 +53,7 @@ export class UserService {
     }
     user.verificationCode = null;
     user.verifiedAt = new Date();
+    user.fcmToken = fcmToken;
     await this.userRepository.save(user);
 
     // return status code 200
@@ -62,7 +63,7 @@ export class UserService {
   }
 
   async create(createUserDto: CreateUserDto) {
-    const { name, email, username } = createUserDto;
+    const { username, email } = createUserDto;
 
     // check if user has been registered
     const check = await this.userRepository.findOneBy({ email });
@@ -73,9 +74,9 @@ export class UserService {
     const verificationCode = Math.random()
       .toString(36)
       .substring(2, 8)
-      .toUpperCase();
+      .toLowerCase();
 
-    const user = { name, username, email, verificationCode };
+    const user = { username, email, verificationCode };
 
     await this.sendCodeByEmail(user.email, verificationCode);
 

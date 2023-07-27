@@ -5,4 +5,6 @@ export class VerificationCode {
   email: string;
   @ApiProperty({ default: 'ERT8GH' })
   verificationCode: string;
+  @ApiProperty()
+  fcmToken: string;
 }

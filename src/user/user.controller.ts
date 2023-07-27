@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   HttpCode,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -14,6 +15,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { VerificationCode } from './dto/verification-code.dto';
 import { LoginDto } from './dto/login.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('user')
 @Controller('user')
@@ -65,4 +67,8 @@ export class UserController {
   verificationCode(@Body() verificationCode: VerificationCode) {
     return this.userService.verificationCode(verificationCode);
   }
+
+  @Post('/upload-avatar')
+  @UseInterceptors(FileInterceptor('avatar'))
+
 }
