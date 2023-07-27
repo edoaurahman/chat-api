@@ -14,10 +14,12 @@ import { Server, Socket } from 'socket.io';
     origin: '*',
   },
 })
+
 export class MessageGateway {
+
   @WebSocketServer()
   server: Server;
-  constructor(private readonly messageService: MessageService) {}
+  constructor(private readonly messageService: MessageService) { }
 
   @SubscribeMessage('join')
   join(

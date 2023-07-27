@@ -1,6 +1,13 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { serviceAccount } from './config/serviceAccount';
+import * as admin from 'firebase-admin';
+
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+});
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

@@ -21,6 +21,10 @@ export class User {
   })
   verificationCode: string;
 
+  @Column('text', { name: 'fcmToken', nullable: true })
+  fcmToken: string
+
   @Column('datetime', { name: 'verified_at', nullable: true })
   verifiedAt: Date;
+
 }
