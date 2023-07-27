@@ -1,9 +1,8 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { serviceAccount } from './config/serviceAccount';
 import * as admin from 'firebase-admin';
-
+import { serviceAccount } from './config/firebase-admin-key';
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),

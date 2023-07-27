@@ -1,12 +1,23 @@
 import { Injectable } from '@nestjs/common';
 import { CreateMessageDto } from './dto/create-message.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User } from './entities/user.entity';
 
 @Injectable()
 export class MessageService {
+  constructor(
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+  ) {}
   private readonly privateRooms: { [roomId: string]: string[] } = {};
   private readonly users = [];
   private readonly pendingMessages: { [username: string]: CreateMessageDto[] } =
     {};
+
+  async getFcmTokenByUsername(username: string) {
+    return (await this.userRepository.findOneBy({ username })).fcmToken;
+  }
 
   removeUser(id: string) {
     delete this.users[id];
