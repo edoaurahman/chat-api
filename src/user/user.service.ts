@@ -101,8 +101,8 @@ export class UserService {
     return user;
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto) {
-    const user = await this.userRepository.findOneBy({ id });
+  async update(username: string, updateUserDto: UpdateUserDto) {
+    const user = await this.userRepository.findOneBy({ username });
     if (!user) {
       throw new HttpException('User not found', 404);
     }

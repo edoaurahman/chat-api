@@ -8,14 +8,19 @@ import {
   Delete,
   HttpCode,
   UseInterceptors,
+  UploadedFile,
+  ParseFilePipe,
+  FileTypeValidator,
+  MaxFileSizeValidator,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiBody, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { VerificationCode } from './dto/verification-code.dto';
 import { LoginDto } from './dto/login.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { FileUploadDto } from './dto/file-upload.dto';
 
 @ApiTags('user')
 @Controller('user')
@@ -43,10 +48,13 @@ export class UserController {
     return this.userService.findOne(+id);
   }
 
-  @Patch(':id')
+  @Patch(':username')
   @ApiBody({ type: UpdateUserDto, description: 'Update a user by id' })
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
+  update(
+    @Param('username') username: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
+    return this.userService.update(username, updateUserDto);
   }
 
   @Delete(':id')
@@ -69,6 +77,20 @@ export class UserController {
   }
 
   @Post('/upload-avatar')
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({ type: FileUploadDto, description: 'Upload avatar' })
   @UseInterceptors(FileInterceptor('avatar'))
-
+  uploadAvatar(
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 5000000 }),
+          new FileTypeValidator({ fileType: 'image/jpeg' }),
+        ],
+      }),
+    )
+    file?: Express.Multer.File,
+  ) {
+    console.log(file);
+  }
 }
