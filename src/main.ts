@@ -10,6 +10,11 @@ admin.initializeApp({
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.enableCors({
+    allowedHeaders: '*',
+    origin: '*',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+  });
   const config = new DocumentBuilder()
     .setTitle('Chat API')
     .setDescription('This is chat API')
