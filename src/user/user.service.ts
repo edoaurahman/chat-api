@@ -7,6 +7,7 @@ import { User } from './entities/user.entity';
 import { VerificationCode } from './dto/verification-code.dto';
 import { LoginDto } from './dto/login.dto';
 import { HttpService } from '@nestjs/axios';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable()
 export class UserService {
@@ -123,10 +124,12 @@ export class UserService {
   async sendCodeByEmail(email: string, code: string) {
     try {
       // post email and code to chat-me-mailer.vercel.app/api/v1
-      this.httpService.post('https://chat-me-mailer.vercel.app/api/v1', {
-        email,
-        otp: code,
-      });
+      const res = await firstValueFrom(
+        this.httpService.post('https://chat-me-mailer.vercel.app/api/v1', {
+          email,
+          otp: code,
+        }),
+      );
     } catch (e) {
       console.log(e);
       throw new HttpException('OTP not sent', 500);
