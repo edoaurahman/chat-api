@@ -7,11 +7,13 @@ import { User } from './entities/user.entity';
 import { VerificationCode } from './dto/verification-code.dto';
 import { LoginDto } from './dto/login.dto';
 import { MailerService } from '@nestjs-modules/mailer';
+import { HttpService } from '@nestjs/axios';
 
 @Injectable()
 export class UserService {
   constructor(
     private readonly mailerService: MailerService,
+    private readonly httpService: HttpService,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
   ) {}
@@ -122,11 +124,10 @@ export class UserService {
 
   async sendCodeByEmail(email: string, code: string) {
     try {
-      await this.mailerService.sendMail({
-        to: email,
-        from: '"ChatMe" <edoaurahman@gmail.com>',
-        subject: 'OTP Verification',
-        html: `<p>Your otp code is : <h1>${code}</h1></p>`,
+      // post email and code to chat-me-mailer.vercel.app/api/v1
+      this.httpService.post('https://chat-me-mailer.vercel.app/api/v1', {
+        email,
+        otp: code,
       });
     } catch (e) {
       console.log(e);
