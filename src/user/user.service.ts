@@ -6,13 +6,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { VerificationCode } from './dto/verification-code.dto';
 import { LoginDto } from './dto/login.dto';
-import { MailerService } from '@nestjs-modules/mailer';
 import { HttpService } from '@nestjs/axios';
 
 @Injectable()
 export class UserService {
   constructor(
-    private readonly mailerService: MailerService,
     private readonly httpService: HttpService,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,

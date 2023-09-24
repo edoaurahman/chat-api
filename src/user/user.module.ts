@@ -4,7 +4,6 @@ import { UserController } from './user.controller';
 import { User } from './entities/user.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MulterModule } from '@nestjs/platform-express';
-// import { extname } from 'path';
 
 @Module({
   imports: [
