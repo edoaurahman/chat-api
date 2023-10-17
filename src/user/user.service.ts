@@ -123,11 +123,12 @@ export class UserService {
 
   async sendCodeByEmail(email: string, code: string) {
     try {
-      // post email and code to chat-me-mailer.vercel.app/api/v1
-      const res = await firstValueFrom(
-        this.httpService.post('https://chat-me-mailer.vercel.app/api/v1', {
-          email,
-          otp: code,
+      firstValueFrom(
+        this.httpService.post('https://mailer.edodev.my.id/send', {
+          from: 'noreply',
+          to: email,
+          subject: 'Verification Code',
+          html: `<p>Verification Code: ${code}</p>`,
         }),
       );
     } catch (e) {
